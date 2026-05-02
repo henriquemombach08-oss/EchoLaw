@@ -24,15 +24,17 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  const { pathname } = request.nextUrl
+
   const protectedPaths = ['/analise', '/historico', '/dashboard']
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
+  const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
   if (isProtected && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   const authPaths = ['/login', '/register']
-  const isAuthPage = authPaths.some(p => request.nextUrl.pathname.startsWith(p))
+  const isAuthPage = authPaths.some(p => pathname.startsWith(p))
 
   if (isAuthPage && user) {
     return NextResponse.redirect(new URL('/analise/nova', request.url))
@@ -42,5 +44,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
