@@ -1,46 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 
-export async function proxy(request: NextRequest) {
-  const response = NextResponse.next({ request })
+const SESSION_COOKIE = 'sb-zjuvtuxxsrmqffnbhopq-auth-token'
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
+const PROTECTED = ['/analise', '/historico', '/dashboard']
+const AUTH_PAGES = ['/login', '/register']
 
-  const { data: { user } } = await supabase.auth.getUser()
-
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const hasSession = request.cookies.has(SESSION_COOKIE)
 
-  const protectedPaths = ['/analise', '/historico', '/dashboard']
-  const isProtected = protectedPaths.some(p => pathname.startsWith(p))
-
-  if (isProtected && !user) {
+  if (PROTECTED.some(p => pathname.startsWith(p)) && !hasSession) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  const authPaths = ['/login', '/register']
-  const isAuthPage = authPaths.some(p => pathname.startsWith(p))
-
-  if (isAuthPage && user) {
+  if (AUTH_PAGES.some(p => pathname.startsWith(p)) && hasSession) {
     return NextResponse.redirect(new URL('/analise/nova', request.url))
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
