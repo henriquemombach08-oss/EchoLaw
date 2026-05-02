@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
@@ -24,11 +24,12 @@ export async function POST(request: NextRequest) {
   const path = `${user.id}/${Date.now()}.${ext}`
   const buffer = await file.arrayBuffer()
 
-  const { error } = await supabase.storage
+  const serviceClient = createServiceClient()
+  const { error } = await serviceClient.storage
     .from('documents')
     .upload(path, buffer, { contentType: file.type })
 
-  if (error) return NextResponse.json({ error: 'Erro ao fazer upload' }, { status: 500 })
+  if (error) return NextResponse.json({ error: `Erro ao fazer upload: ${error.message}` }, { status: 500 })
 
   return NextResponse.json({ path, name: file.name })
 }

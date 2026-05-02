@@ -43,12 +43,12 @@ export async function POST(request: NextRequest) {
   }
 
   // Download file from storage
-  const { data: fileData, error: downloadError } = await supabase.storage
+  const { data: fileData, error: downloadError } = await service.storage
     .from('documents')
     .download(documentPath)
 
   if (downloadError || !fileData) {
-    return NextResponse.json({ error: 'Erro ao baixar arquivo' }, { status: 500 })
+    return NextResponse.json({ error: `Erro ao baixar arquivo: ${downloadError?.message}` }, { status: 500 })
   }
 
   // Extract text
