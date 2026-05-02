@@ -36,8 +36,11 @@ export async function analyzeWithLLM(
     ],
     temperature: 0.2,
     max_tokens: 2000,
+    response_format: { type: 'json_object' },
   })
-  return response.choices[0].message.content ?? ''
+  const content = response.choices[0].message.content ?? ''
+  // Strip markdown code fences if model ignores the format instruction
+  return content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
 }
 
 export async function streamChat(

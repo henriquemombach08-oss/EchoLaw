@@ -106,17 +106,16 @@ export async function POST(request: NextRequest) {
   const typeKeywords = ['contrato', 'notificação', 'multa', 'termo', 'rescisão', 'cobrança']
   const detectedType = typeKeywords.find(k => rawText.toLowerCase().includes(k)) ?? 'outro'
 
-  // Analyze with GPT-4o
-  const rawResult = await analyzeWithLLM(
-    ANALYSIS_SYSTEM_PROMPT,
-    ANALYSIS_USER_PROMPT(preview, legalContext, detectedType)
-  )
-
   let result: AnalysisResult
   try {
+    const rawResult = await analyzeWithLLM(
+      ANALYSIS_SYSTEM_PROMPT,
+      ANALYSIS_USER_PROMPT(preview, legalContext, detectedType)
+    )
     result = JSON.parse(rawResult)
-  } catch {
-    return NextResponse.json({ error: 'Erro ao processar análise. Tente novamente.' }, { status: 500 })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: `Erro ao processar análise: ${msg}` }, { status: 500 })
   }
 
   // Save analysis
