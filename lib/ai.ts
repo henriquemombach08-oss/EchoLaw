@@ -6,7 +6,7 @@ const ANALYSIS_MODEL = 'llama-3.3-70b-versatile'
 const CHAT_MODEL = 'llama-3.3-70b-versatile'
 const VISION_MODEL = 'llama-3.2-11b-vision-preview'
 
-export async function generateEmbedding(text: string): Promise<number[]> {
+async function jinaEmbed(inputs: string[]): Promise<number[][]> {
   const res = await fetch('https://api.jina.ai/v1/embeddings', {
     method: 'POST',
     headers: {
@@ -15,13 +15,29 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     },
     body: JSON.stringify({
       model: 'jina-embeddings-v3',
-      input: [text.slice(0, 8000)],
+      input: inputs.map(t => t.slice(0, 8000)),
     }),
   })
-
   if (!res.ok) throw new Error(`Jina embedding error: ${res.status}`)
   const data = await res.json()
-  return data.data[0].embedding
+  return data.data.map((d: { embedding: number[] }) => d.embedding)
+}
+
+export async function generateEmbedding(text: string): Promise<number[]> {
+  const [embedding] = await jinaEmbed([text])
+  return embedding
+}
+
+// Batch: up to 100 texts per call, processes in groups of 20 to stay within rate limits
+export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  const BATCH = 20
+  const results: number[][] = []
+  for (let i = 0; i < texts.length; i += BATCH) {
+    const batch = texts.slice(i, i + BATCH)
+    const embeddings = await jinaEmbed(batch)
+    results.push(...embeddings)
+  }
+  return results
 }
 
 export async function analyzeWithLLM(

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { extractTextFromPDF } from '@/lib/pdf-parser'
 import { chunkText } from '@/lib/chunker'
-import { generateEmbedding, analyzeWithLLM, extractTextFromImage } from '@/lib/ai'
+import { generateEmbedding, generateEmbeddings, analyzeWithLLM, extractTextFromImage } from '@/lib/ai'
 import { ANALYSIS_SYSTEM_PROMPT, ANALYSIS_USER_PROMPT } from '@/lib/prompts'
 import { AnalysisResult } from '@/types'
 
@@ -76,20 +76,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro ao salvar documento' }, { status: 500 })
   }
 
-  // Chunk + embed
-  const chunks = chunkText(rawText)
-  const chunkInserts = await Promise.all(
-    chunks.map(async (content, chunk_index) => ({
-      document_id: doc.id,
-      content,
-      embedding: await generateEmbedding(content),
-      chunk_index,
-    }))
-  )
-  await service.from('document_chunks').insert(chunkInserts)
+  // Chunk + embed (max 40 chunks; batch all in one/two Jina calls)
+  const allChunks = chunkText(rawText).slice(0, 40)
+  const docSummaryText = rawText.slice(0, 2000)
+  const textsToEmbed = [...allChunks, docSummaryText]
+  const embeddings = await generateEmbeddings(textsToEmbed)
+  const chunkEmbeddings = embeddings.slice(0, allChunks.length)
+  const docEmbedding = embeddings[allChunks.length]
 
-  // Fetch relevant legal context
-  const docEmbedding = await generateEmbedding(rawText.slice(0, 2000))
+  const chunkInserts = allChunks.map((content, chunk_index) => ({
+    document_id: doc.id,
+    content,
+    embedding: chunkEmbeddings[chunk_index],
+    chunk_index,
+  }))
+  await service.from('document_chunks').insert(chunkInserts)
   const { data: legalChunks } = await service.rpc('match_legal_knowledge', {
     query_embedding: docEmbedding,
     match_count: 5,
