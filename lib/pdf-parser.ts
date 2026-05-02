@@ -1,11 +1,6 @@
-import { PDFParse } from 'pdf-parse'
+import { extractText } from 'unpdf'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  const parser = new PDFParse({ data: new Uint8Array(buffer) })
-  try {
-    const result = await parser.getText()
-    return result.text.trim()
-  } finally {
-    await parser.destroy()
-  }
+  const { text } = await extractText(new Uint8Array(buffer), { mergePages: true })
+  return (text as string).trim()
 }
