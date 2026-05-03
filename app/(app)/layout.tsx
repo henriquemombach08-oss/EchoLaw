@@ -15,6 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {user && (
             <>
               <a href="/historico" className="hover:text-gray-900">Histórico</a>
+              <a href="/perfil" className="hover:text-gray-900">Perfil</a>
               <LogoutButton />
             </>
           )}
