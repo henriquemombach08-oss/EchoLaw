@@ -1,4 +1,5 @@
 import { DisclaimerBanner } from '@/components/disclaimer-banner'
+import { NavLinks } from '@/components/nav-links'
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from '@/components/logout-button'
 
@@ -15,28 +16,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <a href="/analise/nova" className="text-2xl font-black text-[#4a7c59] tracking-tighter">
               EchoLaw
             </a>
-            {user && (
-              <nav className="flex items-center gap-1">
-                <a
-                  href="/analise/nova"
-                  className="px-3 py-1.5 text-sm font-semibold text-[#4a7c59] border-b-2 border-[#4a7c59]"
-                >
-                  Nova Análise
-                </a>
-                <a
-                  href="/historico"
-                  className="px-3 py-1.5 text-sm font-medium text-stone-500 hover:text-[#4a7c59] transition-colors"
-                >
-                  Histórico
-                </a>
-                <a
-                  href="/perfil"
-                  className="px-3 py-1.5 text-sm font-medium text-stone-500 hover:text-[#4a7c59] transition-colors"
-                >
-                  Perfil
-                </a>
-              </nav>
-            )}
+            {user && <NavLinks />}
           </div>
           <div className="flex items-center">
             {user && <LogoutButton />}
@@ -49,10 +29,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <p className="font-semibold text-[#4a7c59]">EchoLaw</p>
           <p>&copy; {new Date().getFullYear()} EchoLaw. Todos os direitos reservados.</p>
           <nav className="flex items-center gap-4">
-            <a href="/termos" className="hover:text-[#4a7c59] transition-colors">Termos</a>
-            <a href="/privacidade" className="hover:text-[#4a7c59] transition-colors">Privacidade</a>
-            <a href="/contato" className="hover:text-[#4a7c59] transition-colors">Contato</a>
-            <a href="/sobre" className="hover:text-[#4a7c59] transition-colors">Sobre</a>
+            <a href="#" className="hover:text-[#4a7c59] transition-colors">Termos</a>
+            <a href="#" className="hover:text-[#4a7c59] transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-[#4a7c59] transition-colors">Contato</a>
+            <a href="#" className="hover:text-[#4a7c59] transition-colors">Sobre</a>
           </nav>
         </div>
       </footer>
