@@ -77,7 +77,7 @@ export function AnalysisResult({ analysis }: { analysis: Analysis }) {
 
       <TabsContent value="risco" className="mt-4">
         {analysis.risk_score !== null ? (
-          <RiskGauge score={analysis.risk_score} explanation={analysis.risk_explanation} />
+          <RiskGauge score={analysis.risk_score} explanation={analysis.risk_explanation ?? undefined} />
         ) : (
           <p className="text-sm text-gray-500">Score não disponível.</p>
         )}
