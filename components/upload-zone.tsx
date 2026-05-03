@@ -2,8 +2,6 @@
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 
 type State = 'idle' | 'uploading' | 'analyzing' | 'error'
 
@@ -89,15 +87,17 @@ export function UploadZone() {
   const isLoading = state === 'uploading' || state === 'analyzing'
 
   return (
-    <div className="w-full max-w-xl mx-auto">
+    <div className="w-full h-full">
       {state === 'idle' || state === 'error' ? (
         <div
           onDrop={onDrop}
           onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
           onDragLeave={() => setDragging(false)}
           onClick={() => inputRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${
-            dragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-300 hover:bg-gray-50'
+          className={`bg-surface-container-low rounded-xl p-8 border-2 border-dashed transition-all group flex flex-col items-center justify-center text-center space-y-6 cursor-pointer min-h-[300px] ${
+            dragging
+              ? 'border-primary bg-primary-fixed/20'
+              : 'border-outline-variant hover:border-primary'
           }`}
         >
           <input
@@ -107,26 +107,76 @@ export function UploadZone() {
             className="hidden"
             onChange={onInputChange}
           />
-          <div className="text-4xl mb-3">📄</div>
-          <p className="font-medium text-gray-700">Arraste seu documento aqui</p>
-          <p className="text-sm text-gray-500 mt-1">ou clique para selecionar</p>
-          <p className="text-xs text-gray-400 mt-3">PDF, JPG, PNG, WEBP — máx. 10MB</p>
 
+          {/* Upload icon */}
+          <div className="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="material-symbols-outlined text-primary text-4xl group-hover:[font-variation-settings:'FILL'_1,'wght'_400,'GRAD'_0,'opsz'_24]">
+              upload_file
+            </span>
+          </div>
+
+          {/* Text */}
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-on-surface">
+              Arraste seu documento aqui
+            </h3>
+            <p className="text-on-surface-variant">
+              ou clique para selecionar do seu dispositivo
+            </p>
+          </div>
+
+          {/* Format badges */}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {['PDF', 'JPG', 'PNG'].map((fmt) => (
+              <span
+                key={fmt}
+                className="px-3 py-1 bg-surface-container-highest rounded text-xs font-bold text-on-secondary-container"
+              >
+                {fmt}
+              </span>
+            ))}
+          </div>
+
+          {/* Error message */}
           {state === 'error' && (
-            <p className="mt-4 text-sm text-red-600 font-medium">{errorMsg}</p>
+            <p className="text-sm text-error font-medium">{errorMsg}</p>
           )}
         </div>
       ) : (
-        <div className="border rounded-xl p-8 text-center space-y-4">
-          <div className="text-2xl">{state === 'uploading' ? '⬆️' : '🔍'}</div>
-          <p className="font-medium text-gray-700">
-            {state === 'uploading' ? 'Enviando arquivo…' : 'Analisando documento…'}
-          </p>
-          <p className="text-sm text-gray-500 truncate">{fileName}</p>
-          <Progress value={progress} className="h-2" />
-          <p className="text-xs text-gray-400">
-            {state === 'analyzing' ? 'Isso pode levar até 30 segundos.' : ''}
-          </p>
+        <div className="bg-surface-container-low rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 min-h-[300px]">
+          {/* Status icon */}
+          <div className="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-4xl">
+              {state === 'uploading' ? 'cloud_upload' : 'manage_search'}
+            </span>
+          </div>
+
+          {/* Status text */}
+          <div className="space-y-1">
+            <h3 className="text-xl font-bold text-on-surface">
+              {state === 'uploading' ? `Enviando... ${progress}%` : 'Analisando...'}
+            </h3>
+            {fileName && (
+              <p className="text-sm text-on-surface-variant truncate max-w-xs mx-auto">
+                {fileName}
+              </p>
+            )}
+            {state === 'analyzing' && (
+              <p className="text-xs text-on-surface-variant">
+                Isso pode levar até 30 segundos.
+              </p>
+            )}
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full max-w-xs">
+            <div className="bg-surface-container rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { ChatMessage } from '@/types'
 
 const QUICK_QUESTIONS = [
@@ -70,61 +68,80 @@ export function ChatWindow({ analysisId }: { analysisId: string }) {
   }
 
   return (
-    <div className="flex flex-col h-[500px] border rounded-xl overflow-hidden">
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+    <div className="border-t border-outline-variant pt-12 mt-16 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="bg-primary p-2 rounded-lg text-on-primary">
+          <span className="material-symbols-outlined text-lg">forum</span>
+        </div>
+        <h2 className="text-2xl font-black text-on-surface">Tire suas dúvidas</h2>
+      </div>
+
+      {/* Message area */}
+      <div className="space-y-6 mb-8">
         {messages.length === 0 && (
-          <p className="text-sm text-gray-400 text-center mt-8">
+          <p className="text-sm text-on-surface-variant text-center py-8">
             Faça uma pergunta sobre o documento.
           </p>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm whitespace-pre-wrap ${
-                msg.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-br-none'
-                  : 'bg-white border text-gray-800 rounded-bl-none'
-              }`}
-            >
-              {msg.content || (loading && i === messages.length - 1 ? '…' : '')}
+          msg.role === 'user' ? (
+            <div key={i} className="flex justify-end">
+              <div className="bg-secondary-container text-on-secondary-container p-4 rounded-2xl rounded-tr-none max-w-[80%] text-sm shadow-sm whitespace-pre-wrap">
+                {msg.content}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div key={i} className="flex justify-start gap-3">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-on-primary flex-shrink-0">
+                <span className="material-symbols-outlined text-xs">smart_toy</span>
+              </div>
+              <div className="bg-surface-container-high text-on-surface p-4 rounded-2xl rounded-tl-none max-w-[80%] text-sm shadow-sm leading-relaxed whitespace-pre-wrap">
+                {msg.content || (loading && i === messages.length - 1 ? '…' : '')}
+              </div>
+            </div>
+          )
         ))}
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t p-3 space-y-2 bg-white">
-        <div className="flex gap-2 flex-wrap">
-          {QUICK_QUESTIONS.map(q => (
-            <button
-              key={q}
-              onClick={() => sendMessage(q)}
-              disabled={loading}
-              className="text-xs px-3 py-1 rounded-full border border-blue-200 text-blue-600 hover:bg-blue-50 disabled:opacity-50"
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                sendMessage(input)
-              }
-            }}
-            placeholder="Pergunte sobre o documento…"
-            rows={2}
-            className="resize-none text-sm"
+      {/* Quick chips */}
+      <div className="flex gap-2 flex-wrap">
+        {QUICK_QUESTIONS.map(q => (
+          <button
+            key={q}
+            onClick={() => sendMessage(q)}
             disabled={loading}
-          />
-          <Button onClick={() => sendMessage(input)} disabled={loading || !input.trim()} size="sm">
-            Enviar
-          </Button>
-        </div>
+            className="bg-surface-bright border border-outline-variant hover:border-primary hover:text-primary transition-all px-4 py-2 rounded-full text-xs font-bold text-on-surface-variant disabled:opacity-50"
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      {/* Input area */}
+      <div className="relative">
+        <input
+          type="text"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              sendMessage(input)
+            }
+          }}
+          placeholder="Pergunte sobre o documento…"
+          disabled={loading}
+          className="bg-surface-container-low border border-outline-variant rounded-xl py-4 pl-6 pr-14 focus:ring-2 focus:ring-primary text-on-surface w-full outline-none text-sm disabled:opacity-60"
+        />
+        <button
+          onClick={() => sendMessage(input)}
+          disabled={loading || !input.trim()}
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-on-primary h-10 w-10 rounded-lg flex items-center justify-center disabled:opacity-50 hover:opacity-90 transition-opacity"
+        >
+          <span className="material-symbols-outlined">send</span>
+        </button>
       </div>
     </div>
   )

@@ -9,19 +9,53 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex flex-col">
       <DisclaimerBanner />
-      <header className="border-b bg-white px-4 py-3 flex items-center justify-between">
-        <a href="/analise/nova" className="font-bold text-gray-900">EchoLaw</a>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          {user && (
-            <>
-              <a href="/historico" className="hover:text-gray-900">Histórico</a>
-              <a href="/perfil" className="hover:text-gray-900">Perfil</a>
-              <LogoutButton />
-            </>
-          )}
+      <header className="bg-[#faf6f0] border-t-4 border-[#705c30] border-b border-stone-200 shadow-[0_4px_20px_rgba(46,50,48,0.06)] sticky top-0 z-50">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
+          <div className="flex items-center gap-8">
+            <a href="/analise/nova" className="text-2xl font-black text-[#4a7c59] tracking-tighter">
+              EchoLaw
+            </a>
+            {user && (
+              <nav className="flex items-center gap-1">
+                <a
+                  href="/analise/nova"
+                  className="px-3 py-1.5 text-sm font-semibold text-[#4a7c59] border-b-2 border-[#4a7c59]"
+                >
+                  Nova Análise
+                </a>
+                <a
+                  href="/historico"
+                  className="px-3 py-1.5 text-sm font-medium text-stone-500 hover:text-[#4a7c59] transition-colors"
+                >
+                  Histórico
+                </a>
+                <a
+                  href="/perfil"
+                  className="px-3 py-1.5 text-sm font-medium text-stone-500 hover:text-[#4a7c59] transition-colors"
+                >
+                  Perfil
+                </a>
+              </nav>
+            )}
+          </div>
+          <div className="flex items-center">
+            {user && <LogoutButton />}
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>
+      <footer className="bg-stone-100 border-t border-stone-200 py-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-3 text-sm text-stone-500">
+          <p className="font-semibold text-[#4a7c59]">EchoLaw</p>
+          <p>&copy; {new Date().getFullYear()} EchoLaw. Todos os direitos reservados.</p>
+          <nav className="flex items-center gap-4">
+            <a href="/termos" className="hover:text-[#4a7c59] transition-colors">Termos</a>
+            <a href="/privacidade" className="hover:text-[#4a7c59] transition-colors">Privacidade</a>
+            <a href="/contato" className="hover:text-[#4a7c59] transition-colors">Contato</a>
+            <a href="/sobre" className="hover:text-[#4a7c59] transition-colors">Sobre</a>
+          </nav>
+        </div>
+      </footer>
     </div>
   )
 }
