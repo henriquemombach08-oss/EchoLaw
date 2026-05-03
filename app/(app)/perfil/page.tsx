@@ -101,7 +101,10 @@ export default async function PerfilPage() {
 
       {isPaid && (
         <p className="text-sm text-gray-500 text-center">
-          Para cancelar ou alterar seu plano, entre em contato pelo suporte.
+          Para cancelar ou alterar seu plano,{' '}
+          <a href="mailto:henriquemombach08@gmail.com?subject=Suporte EchoLaw" className="underline hover:text-gray-700">
+            entre em contato pelo suporte
+          </a>.
         </p>
       )}
     </div>
