@@ -50,6 +50,7 @@ export interface Analysis {
   rights: RightItem[] | null
   draft_response: string | null
   risk_score: number | null
+  risk_explanation: string | null
   created_at: string
   documents?: Document
 }

@@ -25,7 +25,7 @@ function RiskGauge({ score, explanation }: { score: number; explanation?: string
   )
 }
 
-export function AnalysisResult({ analysis }: { analysis: Analysis & { risk_explanation?: string } }) {
+export function AnalysisResult({ analysis }: { analysis: Analysis }) {
   const [copied, setCopied] = useState(false)
 
   function copyDraft() {

@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
       rights: result.rights,
       draft_response: result.draftResponse,
       risk_score: result.riskScore,
+      risk_explanation: result.riskExplanation,
     })
     .select()
     .single()
